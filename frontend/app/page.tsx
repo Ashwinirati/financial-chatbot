@@ -55,14 +55,14 @@ export default function Home() {
       createdAt: nowIso(),
       messages: [],
     };
-    setSessions(prev => [newSession, ...prev]);
+    setSessions(prevSessions => [newSession, ...prevSessions]);
     setCurrentSessionId(newSession.id);
   }
 
   // Add message to current session
   function addMessage(msg: Message) {
-    setSessions(prev =>
-      prev.map(s =>
+    setSessions(prevSessions =>
+      prevSessions.map(s =>
         s.id === currentSessionId ? { ...s, messages: [...s.messages, msg] } : s
       )
     );
@@ -70,8 +70,10 @@ export default function Home() {
 
   // Delete single chat session
   function deleteSession(sessionId: string) {
-    setSessions(prev => prev.filter(s => s.id !== sessionId));
-    if (currentSessionId === sessionId) setCurrentSessionId(prev => (sessions[0]?.id || null));
+    setSessions(prevSessions => prevSessions.filter(s => s.id !== sessionId));
+    if (currentSessionId === sessionId) {
+      setCurrentSessionId(sessions[0]?.id || null);
+    }
   }
 
   // Send message to backend
@@ -103,8 +105,8 @@ export default function Home() {
       let displayed = '';
       for (let i = 0; i < answer.length; i++) {
         displayed += answer[i];
-        setSessions(prev =>
-          prev.map(s =>
+        setSessions(prevSessions =>
+          prevSessions.map(s =>
             s.id === currentSessionId
               ? {
                   ...s,
@@ -119,8 +121,8 @@ export default function Home() {
       }
 
       // Final message with sources
-      setSessions(prev =>
-        prev.map(s =>
+      setSessions(prevSessions =>
+        prevSessions.map(s =>
           s.id === currentSessionId
             ? {
                 ...s,
@@ -131,15 +133,16 @@ export default function Home() {
             : s
         )
       );
-    } catch (err: any) {
-      setSessions(prev =>
-        prev.map(s =>
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setSessions(prevSessions =>
+        prevSessions.map(s =>
           s.id === currentSessionId
             ? {
                 ...s,
                 messages: s.messages.map(m =>
                   m.id === botMsg.id
-                    ? { ...m, text: `⚠️ Error: ${err.message || 'Unknown'}`, sources: [] }
+                    ? { ...m, text: `⚠️ Error: ${message}`, sources: [] }
                     : m
                 ),
               }
@@ -194,7 +197,7 @@ export default function Home() {
                 </div>
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // prevent switching session
+                    e.stopPropagation();
                     deleteSession(s.id);
                   }}
                   className="text-red-500 text-xs font-bold px-1 rounded hover:bg-red-100"
@@ -209,15 +212,13 @@ export default function Home() {
 
         {/* Chat Area */}
         <div className="flex-1 flex flex-col bg-white rounded-3xl shadow-lg h-[95vh] overflow-hidden p-10">
-          {/* Page Heading */}
           <h1 className="text-2xl font-bold mb-4 text-center">💬 Financial Chatbot</h1>
-           <span className="text-gray-500 text-center">Click on ‘+New Chat’ to initiate a conversation.</span>
-          {/* Messages */}
+          <span className="text-gray-500 text-center">Click on ‘+New Chat’ to initiate a conversation.</span>
+
           <div className="flex-1 overflow-y-auto space-y-6">
             {currentSession?.messages.length === 0 && (
               <div className="text-center text-gray-400 italic py-10">
                 Ask me about banking terms, loans, or fraud alerts. <br />
-               
               </div>
             )}
 
@@ -245,7 +246,6 @@ export default function Home() {
             <div ref={scrollRef} />
           </div>
 
-          {/* Input */}
           <div className="mt-4 border-t pt-4 flex flex-col gap-2">
             <div className="flex gap-2">
               <textarea
@@ -262,11 +262,11 @@ export default function Home() {
                 disabled={loading}
               >
                 {loading ? 'Sending...' : 'Send'}
-                
               </button>
             </div>
             <div className="flex justify-between items-center text-xs text-gray-500 mt-2">
-              <div>Responses are informational only.
+              <div>
+                Responses are informational only.
                 <br />Click on ‘New Chat’ to initiate a conversation.
               </div>
             </div>
