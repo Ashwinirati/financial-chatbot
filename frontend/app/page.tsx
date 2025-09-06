@@ -23,7 +23,7 @@ function nowIso() {
 }
 
 export default function Home() {
-  const backend = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://financial-chatbot-3cyq.onrender.com/';
+  const backend = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://financial-chatbot-3cyq.onrender.com';
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [input, setInput] = useState('');
