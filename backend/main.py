@@ -14,7 +14,7 @@ api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
     raise RuntimeError("OPENAI_API_KEY environment variable not set.")
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "https://financial-chatbot-black.vercel.app/")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://financial-chatbot-black.vercel.app")
 
 client = OpenAI(api_key=api_key)
 
